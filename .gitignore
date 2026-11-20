@@ -1,0 +1,14 @@
+# Secrets et binaires
+*.keystore
+*.jks
+keystore.properties
+*.apk
+*.aab
+*.ipa
+.env
+.env.*
+!.env.example
+
+# Système / logs
+.DS_Store
+*.log

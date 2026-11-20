@@ -1,0 +1,267 @@
+/* ============================================================
+   CAM FX — bibliothèque d'animations (40 effets).
+   Toutes les couleurs passent par des variables : ce fichier reste
+   valable quel que soit le thème (bleu roi / noir ou blanc / gris / noir).
+   Chargée après cam-ui.css et theme.css.
+   ============================================================ */
+:root{
+  --fx-accent:var(--accent,#2f55ff);
+  --fx-accent-2:var(--accent-2,#6d8bff);
+  --fx-black:#000;
+  --fx-white:#fff;
+  --fx-ease:cubic-bezier(.22,.7,.25,1);
+  --fx-spring:cubic-bezier(.34,1.56,.64,1);
+}
+/* Résolu SUR le body : suit le thème actif (bleu roi ou blanc/gris/noir).
+   Sinon var(--accent) serait évalué à la racine et resterait orange. */
+body{--fx-accent:var(--accent,#2f55ff);--fx-accent-2:var(--accent-2,#6d8bff)}
+[hidden]{display:none!important}
+
+/* 01. Splash Screen ------------------------------------------------ */
+@keyframes fx-splash-in{from{opacity:0;transform:scale(.86)}to{opacity:1;transform:scale(1)}}
+@keyframes fx-splash-out{to{opacity:0;transform:scale(1.08);filter:blur(14px)}}
+.fx-splash{position:fixed;inset:0;z-index:999;display:grid;place-items:center;
+  background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--fx-accent) 30%,transparent),var(--fx-black) 70%);
+  animation:fx-splash-in .7s var(--fx-ease) both}
+.fx-splash > *{animation:fx-splash-in .9s var(--fx-spring) both .1s}
+.fx-splash.fx-out{animation:fx-splash-out .55s var(--fx-ease) forwards}
+
+/* 02. Smooth Page Transition --------------------------------------- */
+@keyframes fx-page-in{from{transform:translateY(14px)}to{transform:none}}
+@keyframes fx-page-slide{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+@keyframes fx-page-out{to{opacity:0;transform:translateX(-18px)}}
+/* « forwards » et non « both » : si une animation est interrompue / figée,
+   l'élément reste à son état naturel (visible) au lieu de rester à opacity:0. */
+.fx-page-in{animation:fx-page-in .38s var(--fx-ease) forwards}
+.fx-page-slide{animation:fx-page-slide .4s var(--fx-ease) forwards}
+.fx-page-out{animation:fx-page-out .24s var(--fx-ease) forwards}
+
+/* 03. Animated Bottom Navigation ----------------------------------- */
+@keyframes fx-nav-pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+.fx-nav-pop{animation:fx-nav-pop .45s var(--fx-spring) both}
+.fx-nav-indicator{transition:transform .35s var(--fx-spring),width .35s var(--fx-ease)}
+
+/* 04. Floating Action Button --------------------------------------- */
+@keyframes fx-fab-in{from{transform:scale(0) rotate(-90deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+@keyframes fx-fab-pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--fx-accent) 55%,transparent)}
+  50%{box-shadow:0 0 0 14px transparent}}
+.fx-fab{animation:fx-fab-in .55s var(--fx-spring) both}
+.fx-fab-pulse{animation:fx-fab-pulse 2.2s ease-in-out infinite}
+.fx-fab:hover{transform:translateY(-3px) scale(1.05)}
+
+/* 05 + 26. Skeleton / Shimmer --------------------------------------- */
+@keyframes fx-shimmer{100%{transform:translateX(100%)}}
+.fx-skeleton,.fx-shimmer{position:relative;overflow:hidden;background:color-mix(in srgb,var(--fx-white) 8%,transparent);border-radius:8px}
+.fx-skeleton::after,.fx-shimmer::after{content:"";position:absolute;inset:0;transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--fx-white) 16%,transparent),transparent);
+  animation:fx-shimmer 1.5s infinite}
+.fx-skeleton-line{height:12px;margin:8px 0}
+.fx-skeleton-title{height:20px;width:55%}
+
+/* 06. Success Checkmark -------------------------------------------- */
+@keyframes fx-check-pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes fx-check-draw{to{stroke-dashoffset:0}}
+.fx-check{animation:fx-check-pop .5s var(--fx-spring) both}
+.fx-check circle{stroke-dasharray:170;stroke-dashoffset:170;animation:fx-check-draw .5s var(--fx-ease) forwards .1s}
+.fx-check path{stroke-dasharray:50;stroke-dashoffset:50;animation:fx-check-draw .35s var(--fx-ease) forwards .45s;fill:none;stroke:var(--fx-accent);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+
+/* 07. Interactive Card --------------------------------------------- */
+.fx-card-lift{transition:transform .3s var(--fx-ease),box-shadow .3s var(--fx-ease),border-color .3s}
+.fx-card-lift:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(0,0,0,.45);border-color:var(--fx-accent)}
+.fx-card-lift:active{transform:scale(.985)}
+.fx-card-tilt{transition:transform .25s var(--fx-ease);transform-style:preserve-3d}
+
+/* 08. Bottom Sheet -------------------------------------------------- */
+@keyframes fx-sheet-up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.fx-sheet{position:fixed;left:0;right:0;bottom:0;z-index:200;max-height:82vh;overflow:auto;
+  border-radius:22px 22px 0 0;background:var(--surface,#141414);border-top:1px solid var(--line,#2a2a2a);
+  animation:fx-sheet-up .42s var(--fx-ease) both}
+.fx-sheet-backdrop{position:fixed;inset:0;z-index:199;background:rgba(0,0,0,.6);
+  animation:fx-blur-in .3s both;backdrop-filter:blur(4px)}
+
+/* 09. Logo Reveal --------------------------------------------------- */
+@keyframes fx-logo-reveal{from{transform:scale(.7) rotate(-12deg)}to{transform:none}}
+.fx-logo-reveal{animation:fx-logo-reveal 1s var(--fx-spring) forwards}
+
+/* 10. Profile Reveal ------------------------------------------------ */
+@keyframes fx-profile-reveal{from{transform:translateY(18px) scale(.97)}to{transform:none}}
+.fx-profile-reveal{animation:fx-profile-reveal .6s var(--fx-spring) forwards}
+
+/* 11. Statistics Counter (JS: fxCounter) ---------------------------- */
+.fx-counter{font-variant-numeric:tabular-nums;transition:color .3s}
+.fx-counter.fx-bump{animation:fx-nav-pop .4s var(--fx-spring)}
+
+/* 12. QR Scanner ---------------------------------------------------- */
+@keyframes fx-scanline{0%{top:6%}50%{top:92%}100%{top:6%}}
+.fx-qr-scan{position:relative;overflow:hidden;border-radius:16px}
+.fx-qr-scan::after{content:"";position:absolute;left:6%;right:6%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--fx-accent),transparent);
+  box-shadow:0 0 14px var(--fx-accent);animation:fx-scanline 2.4s ease-in-out infinite}
+
+/* 13. Swipe Gesture ------------------------------------------------- */
+.fx-swipe{transition:transform .3s var(--fx-ease),opacity .3s}
+.fx-swipe[data-swipe="left"]{transform:translateX(-28%);opacity:.5}
+.fx-swipe[data-swipe="right"]{transform:translateX(28%);opacity:.5}
+
+/* 14. Pull to Refresh ----------------------------------------------- */
+.fx-ptr{height:0;overflow:hidden;display:grid;place-items:center;
+  transition:height .28s var(--fx-ease);color:var(--fx-accent)}
+.fx-ptr.fx-active{height:56px}
+.fx-ptr.fx-active .fx-spinner{animation:fx-spin .8s linear infinite}
+
+/* 15. Parallax ------------------------------------------------------ */
+.fx-parallax{will-change:transform;transition:transform .1s linear}
+
+/* 16. Glassmorphism ------------------------------------------------- */
+.fx-glass{background:color-mix(in srgb,var(--fx-white) 9%,transparent);
+  border:1px solid color-mix(in srgb,var(--fx-white) 18%,transparent);
+  backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:0 8px 32px rgba(0,0,0,.22);
+  transition:background .3s,box-shadow .3s}
+.fx-glass:hover{background:color-mix(in srgb,var(--fx-white) 14%,transparent)}
+
+/* 17. Liquid Motion ------------------------------------------------- */
+@keyframes fx-liquid{0%,100%{border-radius:42% 58% 63% 37% / 41% 44% 56% 59%;transform:rotate(0)}
+  50%{border-radius:60% 40% 35% 65% / 57% 58% 42% 43%;transform:rotate(12deg)}}
+.fx-liquid{animation:fx-liquid 8s ease-in-out infinite}
+
+/* 18. 3D Card Flip -------------------------------------------------- */
+.fx-flip{perspective:1000px}
+.fx-flip-inner{position:relative;transform-style:preserve-3d;transition:transform .7s var(--fx-ease)}
+.fx-flip.flipped .fx-flip-inner{transform:rotateY(180deg)}
+.fx-flip-face{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.fx-flip-back{position:absolute;inset:0;transform:rotateY(180deg)}
+
+/* 19. Morphing Button ----------------------------------------------- */
+.fx-morph{transition:width .4s var(--fx-spring),border-radius .4s var(--fx-ease),padding .4s var(--fx-ease)}
+.fx-morph.fx-loading{width:52px;border-radius:50%;padding:0;overflow:hidden}
+
+/* 20. Animated Progress Bar ----------------------------------------- */
+@keyframes fx-progress{from{width:0}}
+.fx-progress{height:8px;border-radius:999px;background:color-mix(in srgb,var(--fx-white) 10%,transparent);overflow:hidden}
+.fx-progress > i{display:block;height:100%;border-radius:999px;
+  background:linear-gradient(90deg,var(--fx-accent),var(--fx-accent-2));
+  animation:fx-progress 1.1s var(--fx-ease) both}
+
+/* 21. Circular Progress --------------------------------------------- */
+@keyframes fx-ring{from{stroke-dashoffset:var(--fx-ring-len,289)}to{stroke-dashoffset:var(--fx-ring-to,60)}}
+.fx-ring{transform:rotate(-90deg)}
+.fx-ring circle{fill:none;stroke-width:8;stroke-linecap:round;stroke-dasharray:var(--fx-ring-len,289);
+  animation:fx-ring 1.2s var(--fx-ease) both}
+
+/* 22. Toast Notification -------------------------------------------- */
+@keyframes fx-toast-in{from{opacity:0;transform:translate(-50%,24px) scale(.94)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+.fx-toast{position:fixed;left:50%;bottom:88px;z-index:300;transform:translateX(-50%);
+  padding:11px 18px;border-radius:999px;font-size:.86em;white-space:nowrap;
+  background:var(--surface,#141414);border:1px solid var(--line,#2a2a2a);box-shadow:0 12px 34px rgba(0,0,0,.5);
+  animation:fx-toast-in .4s var(--fx-spring) both}
+.fx-toast.fx-out{animation:fx-page-out .25s var(--fx-ease) forwards}
+
+/* 23. Modal Transition ---------------------------------------------- */
+@keyframes fx-modal-in{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:none}}
+.fx-modal-backdrop{position:fixed;inset:0;z-index:250;display:grid;place-items:center;
+  background:rgba(0,0,0,.65);backdrop-filter:blur(6px);animation:fx-blur-in .3s both}
+.fx-modal{animation:fx-modal-in .42s var(--fx-spring) both;max-width:min(92vw,460px);width:100%}
+
+/* 24. Accordion ----------------------------------------------------- */
+.fx-accordion{overflow:hidden;transition:max-height .38s var(--fx-ease),opacity .3s}
+.fx-accordion[data-open="false"]{max-height:0!important;opacity:0}
+.fx-accordion[data-open="true"]{opacity:1}
+
+/* 25. Image Zoom ---------------------------------------------------- */
+.fx-zoom{overflow:hidden}
+.fx-zoom img{transition:transform .55s var(--fx-ease)}
+.fx-zoom:hover img{transform:scale(1.12)}
+
+/* 27. Page Indicator ------------------------------------------------ */
+.fx-dots{display:flex;gap:6px;justify-content:center}
+.fx-dots i{width:7px;height:7px;border-radius:999px;background:color-mix(in srgb,var(--fx-white) 25%,transparent);
+  transition:width .32s var(--fx-spring),background .32s}
+.fx-dots i.on{width:22px;background:var(--fx-accent)}
+
+/* 28. Onboarding Illustration --------------------------------------- */
+@keyframes fx-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.fx-onboarding{animation:fx-float 3.4s ease-in-out infinite}
+/* Le stagger ne joue QUE sur le déplacement : un élément interrompu reste
+   toujours parfaitement visible (pas d'opacité à 0 figée). */
+@keyframes fx-stagger-in{from{transform:translateY(12px)}to{transform:translateY(0)}}
+.fx-onboarding-stagger > *{animation:fx-stagger-in .6s var(--fx-ease) forwards}
+.fx-onboarding-stagger > *:nth-child(2){animation-delay:.09s}
+.fx-onboarding-stagger > *:nth-child(3){animation-delay:.18s}
+.fx-onboarding-stagger > *:nth-child(4){animation-delay:.27s}
+
+/* 29. Loading Spinner ----------------------------------------------- */
+@keyframes fx-spin{to{transform:rotate(360deg)}}
+.fx-spinner{width:22px;height:22px;border-radius:50%;border:2.5px solid color-mix(in srgb,var(--fx-white) 18%,transparent);
+  border-top-color:var(--fx-accent);animation:fx-spin .8s linear infinite;display:inline-block}
+
+/* 30. Haptic Feedback ------------------------------------------------ */
+@keyframes fx-haptic{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-2px)}80%{transform:translateX(2px)}}
+.fx-haptic{animation:fx-haptic .32s ease-in-out}
+
+/* 31. Drag and Drop -------------------------------------------------- */
+.fx-drag{cursor:grab;transition:transform .2s var(--fx-ease),box-shadow .2s,opacity .2s}
+.fx-drag.dragging{cursor:grabbing;transform:scale(1.04);box-shadow:0 18px 36px rgba(0,0,0,.45);opacity:.92}
+.fx-drop-target{outline:2px dashed var(--fx-accent);outline-offset:4px}
+
+/* 32. Swipe to Delete ------------------------------------------------ */
+.fx-swipe-delete{position:relative;overflow:hidden;transition:transform .3s var(--fx-ease)}
+.fx-swipe-delete .fx-delete-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;
+  padding-right:20px;background:var(--bad,#ef4444);color:#fff;font-weight:700}
+.fx-swipe-delete > .fx-delete-content{position:relative;background:var(--surface,#141414);transition:transform .3s var(--fx-ease)}
+.fx-swipe-delete.open > .fx-delete-content{transform:translateX(-84px)}
+
+/* 33. Floating Label Input ------------------------------------------ */
+.fx-float-field{position:relative;padding-top:16px}
+.fx-float-field input{height:52px;padding:16px 12px 8px}
+.fx-float-field label{position:absolute;left:12px;top:26px;margin:0;pointer-events:none;
+  color:var(--muted,#a8a8a8);transition:transform .22s var(--fx-ease),color .22s,font-size .22s}
+.fx-float-field input:focus + label,.fx-float-field input:not(:placeholder-shown) + label{
+  transform:translateY(-18px) scale(.82);transform-origin:left;color:var(--fx-accent)}
+
+/* 34. Toggle Switch -------------------------------------------------- */
+.fx-toggle{width:52px;height:30px;border-radius:999px;position:relative;cursor:pointer;
+  background:color-mix(in srgb,var(--fx-white) 16%,transparent);transition:background .3s var(--fx-ease)}
+.fx-toggle::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;
+  background:var(--fx-white);transition:transform .32s var(--fx-spring)}
+.fx-toggle.on{background:var(--fx-accent)}
+.fx-toggle.on::after{transform:translateX(22px)}
+
+/* 35. Micro-interaction --------------------------------------------- */
+.fx-micro{transition:transform .18s var(--fx-spring),filter .18s}
+.fx-micro:active{transform:scale(.93)}
+.fx-micro:hover{filter:brightness(1.12)}
+
+/* 36. Staggered List ------------------------------------------------ */
+.fx-stagger > *{animation:fx-stagger-in .45s var(--fx-ease) forwards}
+.fx-stagger > *:nth-child(1){animation-delay:.03s}
+.fx-stagger > *:nth-child(2){animation-delay:.07s}
+.fx-stagger > *:nth-child(3){animation-delay:.11s}
+.fx-stagger > *:nth-child(4){animation-delay:.15s}
+.fx-stagger > *:nth-child(5){animation-delay:.19s}
+.fx-stagger > *:nth-child(6){animation-delay:.23s}
+.fx-stagger > *:nth-child(n+7){animation-delay:.27s}
+
+/* 37. Magnetic Button (JS: fxMagnetic) ------------------------------ */
+.fx-magnetic{transition:transform .22s var(--fx-ease);will-change:transform}
+
+/* 38. Blur Transition ------------------------------------------------ */
+@keyframes fx-blur-in{from{opacity:0;backdrop-filter:blur(0)}to{opacity:1}}
+.fx-blur-in{animation:fx-blur-in .35s var(--fx-ease) both}
+
+/* 39. Animated Gradient Background ---------------------------------- */
+@keyframes fx-gradient{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.fx-gradient-bg{background:linear-gradient(125deg,var(--fx-black),color-mix(in srgb,var(--fx-accent) 45%,var(--fx-black)),var(--fx-black),color-mix(in srgb,var(--fx-accent-2) 35%,var(--fx-black)));
+  background-size:300% 300%;animation:fx-gradient 14s ease infinite}
+
+/* 40. Confetti (JS: fxConfetti) ------------------------------------- */
+@keyframes fx-confetti-fall{to{transform:translateY(105vh) rotate(720deg);opacity:0}}
+.fx-confetti{position:fixed;top:-14px;width:9px;height:14px;z-index:400;pointer-events:none;
+  animation:fx-confetti-fall var(--fx-dur,2.6s) linear forwards}
+
+/* Respect de l'accessibilité ---------------------------------------- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .fx-splash{display:none}
+}

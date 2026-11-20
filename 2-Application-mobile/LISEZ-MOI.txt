@@ -1,0 +1,40 @@
+2 · APPLICATION MOBILE — CAM
+============================
+
+Parcours (3 pages)
+------------------
+1. bienvenue.html  : page d'accueil bleu roi + noir, « CAM » en haut à gauche,
+                     « Commencer » et « J'ai déjà un compte » → index.html
+2. index.html      : page de connexion (onglets Connexion / Créer un compte,
+                     champs flottants, Google/Apple, animation de succès)
+3. index.html      : l'application (Accueil, Agenda, Prière, Dons, Rendez-vous,
+                     Prédications, Carte de membre)
+   pasteur.html    : page indépendante du pasteur pour répondre aux fidèles
+   (tableau de bord : 1-Web-Tableau-de-bord/ — inchangé)
+
+Backend
+-------
+La connexion utilise les comptes réels du serveur CAM :
+  POST /api/member/auth/login      (username + password)
+  POST /api/member/auth/register  (username, prenom, nom, tel, password 12+)
+  GET  /api/member/auth/me        (session déjà ouverte)
+  POST /api/member/auth/logout
+  GET  /api/public/bootstrap      (événements depuis PostgreSQL)
+  GET/POST /api/member/messages   (chat 1:1 avec le pasteur)
+Mot de passe : 12 caractères minimum. Aucun mot de passe n'est stocké côté client.
+
+Animations
+----------
+- cam-fx.css + cam-fx.js : package des 40 effets CAM (chargés sur toutes les pages).
+- Animations natives du fichier source : splash retiré, croix parallaxe, onglets,
+  champs flottants, ripple, confettis, shimmer, flip 3D, compte à rebours,
+  machine à écrire, orbes flottants, equalizer, bottom sheet, toast, checkmark.
+  Elles sont conservées telles quelles dans index.html.
+
+Thème : bleu roi + noir pur, forcé via data-theme="dark". Le tableau de bord
+garde sa propre palette orange, il n'est pas modifié.
+
+Sauvegarde de l'ancienne application : _sauvegarde-avant-dossier-sans-titre/2-Application-mobile/
+Source du dossier sans titre : _source-dossier-sans-titre.html (copie de contrôle).
+
+Ouvrir (depuis le backend, jamais en file://) : bienvenue.html

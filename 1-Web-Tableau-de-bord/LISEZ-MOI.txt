@@ -1,0 +1,90 @@
+1 · WEB — TABLEAU DE BORD
+=========================
+
+Ouvrir : connexion.html
+L’administrateur initial se configure via `ADMIN_USERNAME` et `ADMIN_PASSWORD`
+dans `backend/.env`, puis `npm run setup`.
+
+Ce dossier contient tout ce qu'il faut : index.html, connexion.html,
+theme.css, store.js, auth.js, cam.js, qrcode.js. Aucun autre dossier n'est
+nécessaire.
+
+La connexion se fait sur connexion.html, puis ouvre index.html après
+authentification. En ouvrant directement index.html, un écran de connexion
+reste également disponible.
+
+Lancez les applications depuis le backend Node.js pour utiliser la session
+serveur et PostgreSQL. Ouvrir les fichiers directement ou avec Live Server
+n'active pas l'authentification serveur.
+
+Essai des présences par QR :
+- Depuis le tableau de bord, ouvrir « QR Code permanent », puis générer le QR
+  de présence. Il mène à presence.html; la personne choisit ensuite l’événement.
+- Un membre doit se connecter à son compte; le serveur associe le pointage au
+  membre de la session et n’accepte pas un identifiant de membre fourni par le navigateur.
+  L’invité renseigne son nom, ses prénoms et son téléphone (obligatoires), ainsi
+  que son e-mail et son adresse (facultatifs).
+- La présence est pointée immédiatement et apparaît dans le tableau de bord.
+  Les doublons sont refusés pour un même membre/événement ou un même numéro
+  d’invité/événement.
+- Avec le backend actif, la page charge les événements depuis PostgreSQL et
+  écrit les pointages dans la base partagée sans publier l’annuaire des membres.
+  Le QR doit pointer vers une adresse réseau accessible par les téléphones.
+
+QR de contributions :
+- Dans « Finances », ouvrir « Générer le QR code E-offring » pour afficher ou
+  télécharger un QR qui mène à l’application `../3-E-Offring/`.
+- Le QR reprend l’adresse du tableau de bord quand elle est en HTTPS. En local,
+  saisir dans le champ l’adresse HTTPS publique complète de la page E-offring,
+  puis choisir « Enregistrer et générer le QR ».
+- `localhost` et une IP réseau ne sont pas des adresses publiques scannables en
+  4G/5G. Un tunnel temporaire fonctionne uniquement tant qu’il reste actif.
+- Le QR ouvre la plateforme mais ne configure pas le paiement. Tant qu’un
+  prestataire n’est pas raccordé, E-offring indique qu’aucun débit n’est possible.
+
+Le tableau de bord affiche les indicateurs calculés à partir des données
+enregistrées. Aucune valeur financière fictive n'est affichée.
+
+Accès par rôle :
+- Administrateur, Pasteur et Assistante du Pasteur : accès à tous les modules.
+- Trésorière / Trésorier : modules généraux et modules financiers.
+- Responsable, Responsable financier et Auditeur : événements, départements,
+  préparation du culte, programmes, comptes rendus et ressources. Les modules
+  réservés et financiers sont masqués et refusés lors de la navigation directe.
+- L'administrateur crée dans « Comptes & accès » les comptes Responsable,
+  Responsable financier et Auditeur. Un nouveau compte est inactif jusqu'à ce
+  que l'administrateur l'active. Les comptes existants non administrateurs sont
+  également désactivés lors de la première mise à jour pour être vérifiés et
+  activés par l'administrateur. Chaque Responsable doit être affecté à un
+  département dans « Comptes & accès »; ses membres et présences sont limités
+  à ce département. Les comptes de direction sont gérés séparément.
+  Le rôle Membre n'ouvre pas le tableau de bord; les membres utilisent
+  l'application mobile.
+
+Les sessions et routes administrateur du backend sont protégées côté serveur.
+Les modules qui n'ont pas encore été migrés vers l'API restent locaux et ne
+doivent pas être utilisés avec des données sensibles ou réelles.
+
+La page « Transactions » sépare le contributeur / bénéficiaire, la référence,
+la date, l'heure, le type, le moyen de paiement / la destination, le montant,
+les frais, le montant net, le statut et la référence prestataire. L'export
+reprend ces mêmes champs.
+
+Les demandes d'inscription comme membre envoyées depuis la page de connexion
+du tableau de bord restent en attente jusqu'à leur traitement par
+l'administrateur; leur approbation crée une fiche membre. Pour accéder à
+l'application mobile, un membre peut créer immédiatement son propre compte
+depuis `../2-Application-mobile/connexion.html`. Ce compte mobile est distinct
+d'un compte responsable du tableau de bord. Avec le backend, demandes, fiches
+et comptes membres sont stockés dans PostgreSQL.
+
+Le menu « Présences » regroupe les indicateurs, l'appel individuel ou collectif,
+les présences QR / badge, l'historique filtrable, les absences justifiées ou non,
+les retards, les séances et le suivi des visiteurs. Les séances sont créées et
+programmées dans « Événements »; les heures, lieu, département et effectif attendu
+sont repris dans les présences. Le pointage conserve l'heure, la méthode et le
+compte de saisie. Les exports CSV (Excel) et l'impression PDF utilisent les
+filtres actifs. Les inscriptions mobiles, présences et motifs sont synchronisés
+avec PostgreSQL. Un responsable ne voit que les membres de son département;
+la direction conserve une vue globale. Les matricules existants sont migrés
+automatiquement vers un numéro CAM stable lorsque nécessaire.

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Présence — CAM</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  body{min-height:100vh;background:radial-gradient(ellipse at 18% 15%,rgba(255,122,26,.18),transparent 42%),radial-gradient(ellipse at 85% 85%,rgba(255,82,0,.1),transparent 38%),var(--bg)}
+  .presence-wrap{min-height:100vh;display:grid;place-items:center;padding:20px}
+  .presence-card{width:100%;max-width:620px;padding:clamp(20px,5vw,36px);border:1px solid var(--line);border-radius:22px;background:var(--surface);box-shadow:var(--shadow)}
+  .presence-brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+  .presence-brand .logo{width:48px;height:48px;border-radius:15px}
+  .presence-wrap .logo{background:linear-gradient(135deg,#ffa24d,#ff5200);color:#150800;box-shadow:0 8px 24px rgba(255,98,0,.35)}
+  .presence-brand b{display:block;font:800 1.1em var(--font-title)}
+  .presence-brand small{color:var(--muted)}
+  .presence-card h1{font-size:1.55em;margin-bottom:6px}
+  .presence-card .intro{color:var(--muted);margin-bottom:20px}
+  .presence-card input:focus,.presence-card select:focus{outline-color:#ff7a1a}
+  .choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+  .choice{min-height:112px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:8px;white-space:normal;text-align:left}
+  .choice .ico{font-size:1.6em}
+  .presence-result{margin-top:16px;padding:14px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface2)}
+  .presence-error{margin-top:14px;padding:12px;border-radius:var(--radius-sm);font-size:.86em;background:color-mix(in srgb,var(--bad) 12%,transparent);border:1px solid var(--bad);color:#ffb3b3}
+  .presence-success{margin-top:14px;padding:12px;border-radius:var(--radius-sm);font-size:.9em;background:color-mix(in srgb,var(--ok) 12%,transparent);border:1px solid var(--ok);color:var(--ok)}
+  .presence-footer{margin:18px 0 0;text-align:center;color:var(--muted);font-size:.76em}
+  @media(max-width:420px){.choice-grid{grid-template-columns:1fr}}
+</style>
+<script src="../cam-local.js"></script>
+<script src="store.js"></script>
+</head>
+<body>
+<main class="presence-wrap">
+  <section class="presence-card" aria-labelledby="presence-title">
+    <div class="presence-brand">
+      <div class="logo">CAM</div>
+      <div><b id="church-name">CAM</b><small>Enregistrement des présences</small></div>
+    </div>
+    <h1 id="presence-title">Bienvenue</h1>
+    <p class="intro">Choisissez l’événement, puis connectez-vous pour enregistrer votre présence ou inscrivez-vous comme invité.</p>
+    <div class="field">
+      <label for="presence-event">Événement</label>
+      <select id="presence-event" required>
+        <option value="">Chargement des événements…</option>
+      </select>
+    </div>
+    <div id="presence-message" aria-live="polite"></div>
+    <section id="presence-choice" hidden>
+      <h2>Vous êtes…</h2>
+      <div class="choice-grid">
+        <button class="btn choice" type="button" data-kind="member"><span class="ico">👥</span><b>Membre de l’église</b><small>Connectez-vous à votre compte</small></button>
+        <button class="btn choice" type="button" data-kind="guest"><span class="ico">👋</span><b>Invité(e)</b><small>Remplissez le formulaire de visite</small></button>
+      </div>
+    </section>
+    <section id="member-panel" hidden>
+      <hr>
+      <h2>Connexion membre</h2>
+      <p class="mu small">Après connexion, le pointage est associé à votre propre compte; aucun autre membre ne peut être sélectionné.</p>
+      <form id="member-login-form">
+        <div class="field"><label for="member-username">Identifiant</label><input id="member-username" autocomplete="username" required></div>
+        <div class="field"><label for="member-password">Mot de passe</label><input id="member-password" type="password" autocomplete="current-password" required></div>
+        <button class="btn pri" id="member-login-submit" type="submit">Se connecter</button>
+      </form>
+      <div class="presence-result" id="member-account" hidden></div>
+      <div class="btn-row" id="member-actions" hidden>
+        <button class="btn pri" id="member-submit" type="button">✅ Marquer ma présence</button>
+        <button class="btn" id="member-logout" type="button">Déconnexion</button>
+      </div>
+      <button class="btn" type="button" data-back style="margin-top:12px">Retour</button>
+    </section>
+    <section id="guest-panel" hidden>
+      <hr>
+      <h2>Formulaire invité(e)</h2>
+      <form id="guest-form">
+        <div class="grid g2">
+          <div class="field"><label for="guest-lastname">Nom *</label><input id="guest-lastname" name="nom" required autocomplete="family-name"></div>
+          <div class="field"><label for="guest-firstname">Prénoms *</label><input id="guest-firstname" name="prenoms" required autocomplete="given-name"></div>
+          <div class="field"><label for="guest-phone">Téléphone *</label><input id="guest-phone" name="telephone" type="tel" required autocomplete="tel"></div>
+          <div class="field"><label for="guest-email">E-mail</label><input id="guest-email" name="email" type="email" autocomplete="email"></div>
+          <div class="field"><label for="guest-address">Adresse</label><input id="guest-address" name="adresse" autocomplete="street-address"></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn pri" type="submit">✅ Envoyer et marquer ma présence</button>
+          <button class="btn" type="button" data-back>Retour</button>
+        </div>
+      </form>
+    </section>
+    <p class="presence-footer">La présence d’un membre exige une connexion à son compte. Le pointage invité reste ouvert.</p>
+  </section>
+</main>
+<script>
+(function(){
+  'use strict';
+  var E=window.EGL;
+  var eventSelect=document.getElementById('presence-event');
+  var choice=document.getElementById('presence-choice');
+  var memberPanel=document.getElementById('member-panel');
+  var guestPanel=document.getElementById('guest-panel');
+  var message=document.getElementById('presence-message');
+  var memberLoginForm=document.getElementById('member-login-form');
+  var memberLoginSubmit=document.getElementById('member-login-submit');
+  var memberAccount=document.getElementById('member-account');
+  var memberActions=document.getElementById('member-actions');
+  var memberSubmit=document.getElementById('member-submit');
+  var memberLogout=document.getElementById('member-logout');
+  var currentMember=null;
+  var selectedEvent=null;
+  var requestedEventId=new URLSearchParams(location.search).get('eventId');
+  if(!E){
+    eventSelect.innerHTML='<option value="">Erreur de chargement</option>';
+    message.innerHTML='<div class="presence-error">Impossible de charger les données. Vérifiez que store.js est présent à côté de cette page.</div>';
+    return;
+  }
+  E.state.attendance=[];
+  E.save();
+  var apiBase=(E.state.settings.apiBase||(/^https?:$/.test(location.protocol)?location.origin:'')).replace(/\/$/,'');
+  if(!apiBase){
+    eventSelect.disabled=true;
+    message.innerHTML='<div class="presence-error">Le pointage nécessite le serveur CAM. Aucune présence ne sera enregistrée sur cet appareil.</div>';
+    return;
+  }
+  function initialize(){
+  document.getElementById('church-name').textContent=E.state.settings.church||'CAM';
+  var events=E.list('events').slice().sort(function(a,b){
+    return (a.date||'').localeCompare(b.date||'')||(a.heure||'').localeCompare(b.heure||'');
+  });
+  eventSelect.innerHTML='<option value="">— Choisir un événement —</option>'+
+    events.map(function(ev){
+      return '<option value="'+E.esc(ev.id)+'">'+E.esc(ev.titre)+' · '+E.esc(E.fmtShort(ev.date))+'</option>';
+    }).join('');
+  if(!events.length){
+    eventSelect.disabled=true;
+    message.innerHTML='<div class="presence-error">Aucun événement n’est disponible. Demandez à l’équipe de créer l’événement dans le tableau de bord.</div>';
+  }
+  eventSelect.onchange=function(){
+    selectedEvent=E.find('events',eventSelect.value);
+    memberSubmit.disabled=false;
+    choice.hidden=!selectedEvent;
+    memberPanel.hidden=true;
+    guestPanel.hidden=true;
+    message.textContent='';
+  };
+  document.querySelectorAll('[data-kind]').forEach(function(button){
+    button.onclick=function(){
+      memberPanel.hidden=button.dataset.kind!=='member';
+      guestPanel.hidden=button.dataset.kind!=='guest';
+      message.textContent='';
+      if(button.dataset.kind==='member')showMemberSession();
+    };
+  });
+  document.querySelectorAll('[data-back]').forEach(function(button){
+    button.onclick=function(){
+      memberPanel.hidden=true;
+      guestPanel.hidden=true;
+      message.textContent='';
+      choice.hidden=!selectedEvent;
+    };
+  });
+  function showMessage(text,success){
+    message.innerHTML='<div class="presence-'+(success?'success':'error')+'">'+E.esc(text)+'</div>';
+  }
+  if(requestedEventId){
+    if(events.some(function(ev){return String(ev.id)===requestedEventId})){
+      eventSelect.value=requestedEventId;
+      eventSelect.onchange();
+      if(currentMember){
+        choice.hidden=true;
+        memberPanel.hidden=false;
+        showMemberSession();
+        markMember();
+      }
+    }else{
+      showMessage('Cet événement n’est pas disponible. Demandez un QR code à jour à l’équipe.',false);
+    }
+  }
+  function showMemberSession(){
+    var available=!!apiBase;
+    memberLoginForm.hidden=!available||!!currentMember;
+    memberAccount.hidden=!currentMember;
+    memberActions.hidden=!currentMember;
+    memberSubmit.disabled=!currentMember;
+    if(currentMember){
+      memberAccount.textContent='Connecté : '+[currentMember.prenom,currentMember.nom].filter(Boolean).join(' ');
+    }else if(!available){
+      showMessage('Le pointage sécurisé des membres nécessite le serveur et un compte membre actif.',false);
+    }
+  }
+  function markMember(){
+    if(!apiBase||!selectedEvent||!currentMember)return;
+    memberSubmit.disabled=true;
+    fetch(apiBase+'/api/member/attendance',{
+      method:'POST',
+      credentials:'same-origin',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({eventId:selectedEvent.id})
+    }).then(function(response){
+      return response.json().then(function(data){return {ok:response.ok,status:response.status,data:data}});
+    }).then(function(result){
+      if(!result.ok)throw Object.assign(new Error(result.data.message||'La présence n’a pas pu être enregistrée.'),{status:result.status});
+      showMessage('Présence enregistrée pour '+[currentMember.prenom,currentMember.nom].filter(Boolean).join(' ')+'. Merci !',true);
+    }).catch(function(error){
+      if(error.status===409){
+        showMessage('Votre présence est déjà enregistrée pour cet événement.',true);
+        memberSubmit.disabled=false;
+        return;
+      }
+      if(error.status===401){currentMember=null;showMemberSession()}
+      showMessage(error.message||'Le serveur est injoignable. La présence n’a pas été enregistrée.',false);
+      memberSubmit.disabled=false;
+    });
+  }
+  memberLoginForm.onsubmit=function(event){
+    event.preventDefault();
+    memberLoginSubmit.disabled=true;
+    fetch(apiBase+'/api/member/auth/login',{
+      method:'POST',
+      credentials:'same-origin',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        username:document.getElementById('member-username').value.trim(),
+        password:document.getElementById('member-password').value
+      })
+    }).then(function(response){
+      return response.json().then(function(data){return {ok:response.ok,data:data}});
+    }).then(function(result){
+      if(!result.ok)throw new Error(result.data.message||'Connexion refusée.');
+      currentMember=result.data.member;
+      memberLoginForm.reset();
+      showMemberSession();
+      if(requestedEventId&&selectedEvent&&String(selectedEvent.id)===requestedEventId){
+        choice.hidden=true;
+        memberPanel.hidden=false;
+        markMember();
+      }else{
+        showMessage('Connexion réussie. Vous pouvez maintenant marquer votre présence.',true);
+      }
+    }).catch(function(error){
+      document.getElementById('member-password').value='';
+      showMessage(error.message||'Le serveur est injoignable.',false);
+    }).finally(function(){memberLoginSubmit.disabled=false});
+  };
+  memberSubmit.onclick=markMember;
+  memberLogout.onclick=function(){
+    memberLogout.disabled=true;
+    fetch(apiBase+'/api/member/auth/logout',{
+      method:'POST',
+      credentials:'same-origin'
+    }).then(function(response){
+      if(!response.ok)throw new Error('La déconnexion n’a pas pu être confirmée.');
+      currentMember=null;
+      memberSubmit.disabled=false;
+      showMemberSession();
+      showMessage('Vous êtes déconnecté(e).',true);
+    }).catch(function(error){
+      showMessage(error.message||'Le serveur est injoignable.',false);
+    }).finally(function(){memberLogout.disabled=false});
+  };
+  document.getElementById('guest-form').onsubmit=function(event){
+    event.preventDefault();
+    if(!selectedEvent){showMessage('Choisissez un événement.',false);return}
+    var lastname=document.getElementById('guest-lastname').value.trim();
+    var firstname=document.getElementById('guest-firstname').value.trim();
+    var phone=document.getElementById('guest-phone').value.trim();
+    var email=document.getElementById('guest-email').value.trim();
+    var address=document.getElementById('guest-address').value.trim();
+    if(!lastname||!firstname||!phone){showMessage('Le nom, les prénoms et le téléphone sont obligatoires.',false);return}
+    var phoneKey=phone.replace(/\D/g,'');
+    if(phoneKey.length<6){showMessage('Vérifiez le numéro de téléphone saisi.',false);return}
+    if(apiBase){
+      var guestSubmit=event.target.querySelector('button[type="submit"]');
+      guestSubmit.disabled=true;
+      fetch(apiBase+'/api/public/attendance',{
+        method:'POST',
+        credentials:'same-origin',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({eventId:selectedEvent.id,category:'Invité(e)',nom:lastname,prenom:firstname,tel:phone,email:email,adresse:address})
+      }).then(function(response){
+        return response.json().then(function(data){return {ok:response.ok,data:data}});
+      }).then(function(result){
+        if(!result.ok)throw new Error(result.data.message||'La présence n’a pas pu être enregistrée.');
+        event.target.reset();
+        showMessage('Présence enregistrée pour '+(firstname+' '+lastname).trim()+'. Merci de votre visite !',true);
+      }).catch(function(error){
+        showMessage(error.message||'Le serveur est injoignable. La présence n’a pas été enregistrée.',false);
+      }).finally(function(){guestSubmit.disabled=false});
+      return;
+    }
+    showMessage('Le serveur CAM est requis pour enregistrer une présence. Aucune donnée n’a été conservée sur cet appareil.',false);
+  };
+  }
+  if(apiBase){
+    fetch(apiBase+'/api/public/bootstrap').then(function(response){
+      if(!response.ok)throw new Error('Le service de données n’est pas disponible.');
+      return response.json();
+    }).then(function(data){
+      E.state.events=data.events||[];
+      return fetch(apiBase+'/api/member/auth/me',{credentials:'same-origin'}).then(function(response){
+        if(response.status===401)return null;
+        if(!response.ok)throw new Error('Impossible de vérifier la session membre.');
+        return response.json().then(function(session){return session.member||null});
+      }).then(function(member){
+        currentMember=member;
+        initialize();
+      });
+    }).catch(function(error){
+      eventSelect.disabled=true;
+      message.innerHTML='<div class="presence-error">'+E.esc(error.message||'Le serveur est injoignable. Aucune présence ne peut être enregistrée.')+'</div>';
+    });
+  }
+})();
+</script>
+</body>
+</html>

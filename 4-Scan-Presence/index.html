@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>METANOÏA · Présence — Scanner de badges</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght:500;600;700&family=Manrope:wght:400;500;700&display=swap" rel="stylesheet">
+<script src="../cam-local.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<style>
+:root{--bg:#1d0c45;--bg2:#4b24a0;--card:rgba(255,255,255,.1);--line:rgba(255,138,43,.34);--tx:#f6f0ff;--mut:#c4b8e6;--gold:#ff8a2b;--gold2:#e5560f;--ok:#62e3ad;--warn:#ffd23f;--on-gold:#2a1004;
+--serif:"Cormorant Garamond",Georgia,serif;--sans:"Manrope",system-ui,sans-serif;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--tx);font:400 16px/1.5 var(--sans);overflow-x:hidden}
+.aura{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.aura i{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;animation:drift 18s ease-in-out infinite alternate}
+.aura i:nth-child(1){width:60vmax;height:60vmax;background:radial-gradient(circle,var(--bg2),transparent 70%);top:-20vmax;left:-15vmax}
+.aura i:nth-child(2){width:40vmax;height:40vmax;background:radial-gradient(circle,rgba(255,138,43,.28),transparent 70%);bottom:-15vmax;right:-10vmax;animation-delay:-6s}
+@keyframes drift{to{transform:translate(8vmax,5vmax) scale(1.15)}}
+main{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:22px 18px 40px}
+header{display:flex;align-items:center;gap:14px;margin-bottom:18px;animation:rise .9s cubic-bezier(.2,.8,.2,1) both}
+.logo{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,var(--gold),var(--gold2));box-shadow:0 8px 30px rgba(255,138,43,.35)}
+.logo svg{width:24px;height:24px;stroke:var(--on-gold)}
+h1{font:700 30px/1.05 var(--serif);letter-spacing:4px}
+header p{color:var(--mut);font-size:13px}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}}
+.event,label.lbl{width:100%;background:var(--card);border:1px solid var(--line);border-radius:16px;color:var(--tx);font:500 15px var(--sans);padding:13px 16px;margin-bottom:14px;backdrop-filter:blur(14px)}
+.event option{background:#2a1050;color:var(--tx)}
+label.lbl{display:block;font-size:12px;color:var(--mut);padding:0 0 8px;background:none;border:0;margin:0}
+.event:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.stage{position:relative;aspect-ratio:1/1.05;border-radius:28px;overflow:hidden;background:#000;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.45),0 0 0 6px rgba(255,138,43,.06)}
+video{width:100%;height:100%;object-fit:cover;display:none}
+.stage.live video{display:block}
+.idle{position:absolute;inset:0;display:grid;place-content:center;gap:10px;text-align:center;padding:24px;background:radial-gradient(circle at 50% 40%,var(--bg2),var(--bg));color:var(--tx)}
+.stage.live .idle{display:none}
+.idle h2{font:600 26px var(--serif)}
+.idle p{color:var(--mut);font-size:14px;max-width:26ch;margin:auto}
+.frame{position:absolute;inset:16%;pointer-events:none}
+.frame b{position:absolute;width:38px;height:38px;border:3px solid var(--gold);filter:drop-shadow(0 0 8px var(--gold));animation:breathe 2.6s ease-in-out infinite}
+.frame b:nth-child(1){top:0;left:0;border-right:0;border-bottom:0;border-radius:14px 0 0 0}
+.frame b:nth-child(2){top:0;right:0;border-left:0;border-bottom:0;border-radius:0 14px 0 0}
+.frame b:nth-child(3){bottom:0;left:0;border-right:0;border-top:0;border-radius:0 0 0 14px}
+.frame b:nth-child(4){bottom:0;right:0;border-left:0;border-top:0;border-radius:0 0 14px 0}
+@keyframes breathe{50%{transform:scale(1.06);opacity:.75}}
+.beam{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);box-shadow:0 0 22px 4px rgba(255,138,43,.6);animation:sweep 2.4s ease-in-out infinite}
+@keyframes sweep{0%,100%{top:2%}50%{top:96%}}
+.stage:not(.live) .frame{opacity:.35}
+.stage:not(.live) .beam{display:none}
+.stage.hit{animation:flash .7s}
+@keyframes flash{30%{box-shadow:0 0 0 6px rgba(98,227,173,.5),0 0 90px rgba(98,227,173,.45)}}
+.btns{display:flex;gap:10px;margin:16px 0 10px}
+button{font:700 15px var(--sans);border:0;border-radius:16px;padding:15px 18px;cursor:pointer;transition:transform .15s,box-shadow .25s,background .25s;color:var(--tx)}
+button:active{transform:scale(.97)}
+.primary{flex:1;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--on-gold);box-shadow:0 10px 30px rgba(255,138,43,.3)}
+.primary:hover{box-shadow:0 14px 40px rgba(255,138,43,.5)}
+.ghost{background:var(--card);border:1px solid var(--line)}
+.msg{min-height:20px;color:var(--mut);font-size:13px;margin-bottom:14px}
+.count{display:flex;align-items:baseline;justify-content:space-between;margin:20px 0 12px}
+.count h2{font:600 24px var(--serif)}
+.num{font:700 52px/1 var(--serif);color:var(--gold);font-variant-numeric:tabular-nums}
+.list{display:grid;gap:10px;list-style:none;padding:0}
+.list li{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:13px 15px;backdrop-filter:blur(14px);animation:slide .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes slide{from{opacity:0;transform:translateX(-24px) scale(.97)}}
+.av{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font:700 18px var(--serif);background:linear-gradient(145deg,var(--gold),var(--gold2));color:var(--on-gold);flex:none}
+.who{flex:1;min-width:0}
+.who strong{display:block;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who span{color:var(--mut);font-size:13px}
+.who span.off{color:var(--warn)}
+.empty{text-align:center;color:var(--mut);padding:26px 10px;border:1px dashed var(--line);border-radius:18px}
+.tools{display:flex;gap:10px;margin-top:16px}
+.tools .ghost{flex:1;font-size:14px}
+.links{margin-top:18px;text-align:center;font-size:13px}
+.links a{color:var(--gold)}
+.sheet{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,160%);width:min(92vw,420px);z-index:5;background:linear-gradient(160deg,rgba(78,38,160,.97),rgba(38,15,88,.98));color:#f6efe0;border:1px solid var(--line);border-radius:26px;padding:20px;display:flex;gap:16px;align-items:center;box-shadow:0 30px 80px rgba(0,0,0,.6);transition:transform .35s cubic-bezier(.2,1.2,.3,1)}
+.sheet.on{transform:translate(-50%,0)}
+.ring{width:68px;height:68px;flex:none}
+.ring circle{fill:none;stroke:var(--ok);stroke-width:4;stroke-linecap:round;stroke-dasharray:176;stroke-dashoffset:176}
+.ring path{fill:none;stroke:var(--ok);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40}
+.sheet.on .ring circle{animation:draw .3s ease forwards}
+.sheet.on .ring path{animation:draw .25s .2s ease forwards}
+.sheet.dup .ring circle,.sheet.dup .ring path{stroke:var(--warn)}
+@keyframes draw{to{stroke-dashoffset:0}}
+.sheet h3{font:600 24px/1.1 var(--serif)}
+.sheet p{color:#b9b6cc;font-size:14px;overflow-wrap:anywhere}
+.spark{position:fixed;width:7px;height:7px;border-radius:50%;background:var(--gold);z-index:6;pointer-events:none;box-shadow:0 0 10px var(--gold);animation:fly 1.1s cubic-bezier(.1,.7,.3,1) forwards}
+@keyframes fly{to{transform:translate(var(--x),var(--y)) scale(.2);opacity:0}}
+canvas{display:none}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="aura"><i></i><i></i></div>
+<main>
+<header>
+<div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v20M6 8h12"/></svg></div>
+<div><h1>METANOÏA</h1><p id="date"></p></div>
+</header>
+
+<label class="lbl" for="event">Événement / culte</label>
+<select class="event" id="event" aria-label="Événement"></select>
+<p class="msg" id="hint">Les badges scannés apparaissent dans « Présences » du tableau de bord.</p>
+
+<section class="stage" id="stage">
+<video id="video" playsinline muted></video>
+<div class="idle"><h2>Prêt à scanner</h2><p>Activez la caméra et présentez le QR code du badge.</p></div>
+<div class="frame"><b></b><b></b><b></b><b></b></div>
+<div class="beam"></div>
+</section>
+
+<div class="btns">
+<button class="primary" id="cam">Activer la caméra</button>
+</div>
+<p class="msg" id="msg" role="status"></p>
+
+<div class="count"><h2>Présents aujourd’hui</h2><div class="num" id="num">0</div></div>
+<ul class="list" id="list"></ul>
+<div class="tools">
+<button class="ghost" id="copy">Copier la liste</button>
+<button class="ghost" id="reset">Nouveau culte</button>
+<button class="ghost" id="retry">↻ Renvoyer</button>
+</div>
+<div class="links"><a href="index.html">← Retour au tableau de bord</a></div>
+</main>
+
+<div class="sheet" id="sheet" role="alert">
+<svg class="ring" viewBox="0 0 68 68"><circle cx="34" cy="34" r="28"/><path d="M22 35l9 9 16-18"/></svg>
+<div><h3 id="sh-t"></h3><p id="sh-p"></p></div>
+</div>
+<canvas id="cv"></canvas>
+
+<script>
+const $=s=>document.querySelector(s);
+const apiBase=location.origin;
+const today=new Date().toISOString().slice(0,10);
+let st={day:today,event:'',entries:[]};
+try{const r=JSON.parse(localStorage.getItem('presence-v1')||'null');if(r&&r.day===today)st=r}catch(e){}
+const save=()=>{try{localStorage.setItem('presence-v1',JSON.stringify(st))}catch(e){}};
+$('#date').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+
+/* --- Événements actifs depuis le backend CAM --- */
+async function loadEvents(){
+  let events=[];
+  try{
+    const r=await fetch(apiBase+'/api/public/bootstrap',{credentials:'same-origin'});
+    const d=await r.json();
+    events=(d.events||[]).filter(e=>e.id);
+  }catch(e){events=[]}
+  const sel=$('#event');
+  sel.innerHTML='';
+  const auto=document.createElement('option');
+  auto.value='';auto.textContent='Culte du dimanche (créé automatiquement)';
+  sel.appendChild(auto);
+  events.forEach(e=>{
+    const o=document.createElement('option');
+    o.value=e.id;o.textContent=(e.titre||'Événement')+(e.date?' · '+e.date:'');
+    sel.appendChild(o);
+  });
+  sel.value=[...sel.options].some(o=>o.value===st.event)?st.event:'';
+  st.event=sel.value;
+  sel.onchange=()=>{st.event=sel.value;save()};
+  if(!events.length)$('#hint').textContent='Aucun événement créé : un « Culte du dimanche » sera ajouté automatiquement à la date du jour.';
+}
+
+/* --- Décodage d'un badge : CAM|<matricule|id>|<nom>, JSON ou texte brut --- */
+function label(raw){
+  const s=String(raw||'').trim(),p=s.split('|');
+  if(p[0]==='CAM'&&p.length>=3)return p.slice(2).join('|').trim()||p[1];
+  try{const j=JSON.parse(s);if(j&&(j.nom||j.name))return String(j.nom||j.name)}catch(e){}
+  return p.length>1?p[0].trim():s;
+}
+
+let shown=0;
+function countTo(n){const el=$('#num'),from=shown,t0=performance.now();shown=n;
+ (function f(t){const k=Math.min(1,(t-t0)/600),e=1-Math.pow(1-k,3);el.textContent=Math.round(from+(n-from)*e);if(k<1)requestAnimationFrame(f)})(t0)}
+function render(animateLast){
+  const ul=$('#list');ul.innerHTML='';
+  if(!st.entries.length){ul.innerHTML='<li class="empty">Aucun badge scanné pour ce culte.</li>';countTo(0);return}
+  st.entries.slice().reverse().forEach((e,i)=>{
+    const li=document.createElement('li');
+    if(!(animateLast&&i===0))li.style.animation='none';
+    li.innerHTML='<div class="av"></div><div class="who"><strong></strong><span></span></div>';
+    const nom=e.nom||label(e.code);
+    li.querySelector('.av').textContent=(nom||'?').trim().charAt(0).toUpperCase();
+    li.querySelector('strong').textContent=nom||'Badge';
+    const sub=li.querySelector('span');
+    sub.textContent=(e.statut||'Scanné à')+' '+e.time;
+    if(e.statut&&e.statut.indexOf('Hors ligne')===0)sub.classList.add('off');
+    ul.appendChild(li)});
+  countTo(st.entries.length)}
+function chime(ok){try{const a=new(window.AudioContext||window.webkitAudioContext)(),t=a.currentTime;
+ (ok?[660,990]:[330,330]).forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=f;
+ g.gain.setValueAtTime(0,t+i*.12);g.gain.linearRampToValueAtTime(.16,t+i*.12+.03);g.gain.exponentialRampToValueAtTime(.001,t+i*.12+.5);
+ o.connect(g);g.connect(a.destination);o.start(t+i*.12);o.stop(t+i*.12+.55)})}catch(e){}}
+function burst(){const r=$('#stage').getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+ for(let i=0;i<22;i++){const s=document.createElement('i');s.className='spark';const a=Math.random()*6.28,d=80+Math.random()*130;
+ s.style.left=cx+'px';s.style.top=cy+'px';s.style.setProperty('--x',Math.cos(a)*d+'px');s.style.setProperty('--y',Math.sin(a)*d+'px');
+ document.body.appendChild(s);setTimeout(()=>s.remove(),1200)}}
+let tm;
+function sheet(title,sub,dup){const s=$('#sheet');s.classList.remove('on');void s.offsetWidth;
+ s.classList.toggle('dup',!!dup);$('#sh-t').textContent=title;$('#sh-p').textContent=sub;s.classList.add('on');
+ clearTimeout(tm);tm=setTimeout(()=>s.classList.remove('on'),1400)}
+
+/* --- Scan : envoi au backend, visible dans « Présences » du tableau de bord --- */
+async function sendScan(code){
+  const r=await fetch(apiBase+'/api/public/attendance/scan',{
+    method:'POST',credentials:'same-origin',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({code:code,eventId:st.event||''})
+  });
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d.message||('Erreur '+r.status));
+  return d;
+}
+let busy=false;
+async function handle(raw){
+  raw=(raw||'').trim();if(!raw||busy)return;
+  const stg=$('#stage');
+  if(st.entries.some(e=>e.code===raw)){chime(false);sheet('Déjà scanné','Ce badge a déjà été enregistré pour ce culte.',true);return}
+  busy=true;
+  let nom=label(raw),erreur='',doublon=false;
+  $('#msg').textContent='Envoi de « '+nom+' » au tableau de bord…';
+  try{
+    const d=await sendScan(raw);
+    if(d.nom)nom=String(d.nom);
+    doublon=!!d.doublon;
+  }catch(e){erreur=e.message||'Connexion impossible'}
+  busy=false;
+  const time=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  const statut=erreur?'⚠ Hors ligne':doublon?'Déjà scanné':'✓ Enregistré';
+  st.entries.push({code:raw,nom:nom,time:time,statut:statut});
+  save();render(true);chime(!doublon&&!erreur);burst();
+  stg.classList.remove('hit');void stg.offsetWidth;stg.classList.add('hit');
+  try{navigator.vibrate&&navigator.vibrate(70)}catch(e){}
+  if(erreur){sheet('Hors ligne',nom+' — le scan est gardé sur cet appareil.',true);
+    $('#msg').textContent='Hors ligne : '+erreur+' — le scan n’est pas encore dans le tableau de bord.'}
+  else if(doublon){sheet('Déjà scanné',nom+' est déjà présent.',true);$('#msg').textContent=''}
+  else{sheet('Présent(e)',nom);$('#msg').textContent=nom+' ajouté aux présences du tableau de bord.'}
+}
+
+let stream=null,loop=0,last='',lastT=0,det=null;
+try{if('BarcodeDetector' in window)det=new BarcodeDetector({formats:['qr_code']})}catch(e){}
+async function startCam(){
+ try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+  const v=$('#video');v.srcObject=stream;await v.play();$('#stage').classList.add('live');
+  $('#cam').textContent='Arrêter la caméra';$('#msg').textContent='Caméra active. Placez le QR code du badge dans le cadre.';tick()}
+ catch(e){$('#msg').textContent='Caméra indisponible. Autorisez l’accès dans le navigateur, puis appuyez sur « Activer la caméra ». Sur téléphone, une adresse HTTPS est obligatoire.'}}
+function stopCam(){cancelAnimationFrame(loop);if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;
+ $('#stage').classList.remove('live');$('#cam').textContent='Activer la caméra';$('#msg').textContent=''}
+async function tick(){
+ const v=$('#video');
+ if(v.readyState>=2){let txt='';
+  try{if(det){const r=await det.detect(v);if(r[0])txt=r[0].rawValue}
+   else if(window.jsQR){const c=$('#cv'),x=c.getContext('2d',{willReadFrequently:true}),w=v.videoWidth,h=v.videoHeight;
+    c.width=w;c.height=h;x.drawImage(v,0,0,w,h);const r=jsQR(x.getImageData(0,0,w,h).data,w,h);if(r)txt=r.data}}catch(e){}
+  const now=Date.now();
+  if(txt&&(txt!==last||now-lastT>3500)){last=txt;lastT=now;handle(txt)}}
+ loop=requestAnimationFrame(()=>setTimeout(tick,120))}
+$('#cam').onclick=()=>stream?stopCam():startCam();
+$('#copy').onclick=async()=>{
+ const t=(st.event||'Culte du dimanche')+' · '+today+'\n'+st.entries.map(e=>e.time+' · '+(e.nom||label(e.code))+' · '+e.statut).join('\n');
+ try{await navigator.clipboard.writeText(t);$('#msg').textContent='Liste copiée dans le presse-papiers.'}
+ catch(e){$('#msg').textContent='Copie impossible depuis cette page.'}};
+$('#reset').onclick=()=>{if(!st.entries.length)return;
+ if(!$('#reset').dataset.c){$('#reset').dataset.c=1;$('#reset').textContent='Confirmer l’effacement';setTimeout(()=>{delete $('#reset').dataset.c;$('#reset').textContent='Nouveau culte'},3000);return}
+ st.entries=[];save();render();delete $('#reset').dataset.c;$('#reset').textContent='Nouveau culte';$('#msg').textContent='Liste remise à zéro.'};
+/* --- Renvoie les scans conservés hors ligne --- */
+async function retryPending(){
+  const attente=st.entries.filter(e=>e.statut&&e.statut.indexOf('Hors ligne')===0);
+  if(!attente.length){$('#msg').textContent='Aucun scan en attente d’envoi.';return}
+  let ok=0;
+  for(const e of attente){
+    try{
+      const d=await sendScan(e.code);
+      if(d.nom)e.nom=String(d.nom);
+      e.statut=d.doublon?'Déjà scanné':'✓ Enregistré';
+      ok++;
+    }catch(err){break}
+  }
+  save();render();
+  $('#msg').textContent=ok?ok+' scan(s) transmis au tableau de bord.':'Envoi impossible : vérifiez la connexion au serveur.';
+}
+$('#retry').onclick=retryPending;
+render();
+loadEvents();
+startCam();
+</script>
+</body>
+</html>

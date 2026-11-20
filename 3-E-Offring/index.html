@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Que souhaitez-vous offrir ? — E-Offering</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<script src="../cam-local.js"></script>
+</head>
+<body>
+<div id="bg"><i class="orb o1"></i><i class="orb o2"></i><i class="orb o3"></i><div class="grid"></div></div>
+<main id="app">
+  <div class="hd"><div class="logo">CAM</div><div><h1>E-Offering</h1><small id="ch"></small></div><span class="sc">Paiement non configuré</span></div>
+  <div class="stp"><div class="tr"><div id="bar"></div></div><div class="dots" id="dots"></div><div id="sl"></div></div>
+
+  <section id="sA">
+    <div class="card hero rv"><div class="qrb"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM19 14h2M14 19h2M19 19h2v2"/></svg><i class="scan"></i></div><div><b>QR Code scanné ✓</b><p class="mu">Aucune application ni compte requis.</p></div></div>
+    <h2 class="rv">Que souhaitez-vous offrir ?</h2>
+    <p class="note rv">Version de test : aucun service de paiement n’est connecté. Aucun débit ni reçu confirmé n’est possible.</p>
+    <p class="mu rv">Offrande, dîme, don ou projet spécial.</p>
+    <div class="types" id="types"></div>
+  </section>
+
+  <section id="sB" hidden>
+    <button class="bk" id="b1" type="button">← Changer de nature</button>
+    <h2 class="rv" id="tB">Combien souhaitez-vous donner ?</h2>
+    <div class="amt rv"><input id="mt" type="number" inputmode="numeric" min="100" step="100" placeholder="0" aria-label="Montant en FCFA"><span>FCFA</span></div>
+    <div class="chips rv" id="chips"></div>
+    <div id="pj" class="rv" hidden><label class="l" for="pn">Projet spécial concerné</label><input class="in" id="pn" placeholder="Nom du projet"></div>
+    <label class="l rv" for="nm">Nom (facultatif)</label>
+    <input class="in rv" id="nm" placeholder="Laisser vide pour une contribution anonyme" autocomplete="name">
+    <label class="l rv">Moyen de paiement</label>
+    <div class="mt" id="mts"></div>
+    <button class="btn rv" id="go" type="button">Continuer vers le paiement →</button>
+  </section>
+
+  <section id="sC" hidden>
+    <div class="pulse rv"><i class="ring"></i><i class="ring"></i><div class="core"><svg viewBox="0 0 24 24"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg></div></div>
+    <div class="ctr rv"><h2 style="margin-top:4px">Demande de paiement créée</h2><span class="stt" id="st">Statut : en attente</span></div>
+    <div class="card rv" style="margin-top:16px">
+      <div class="row"><span>Référence unique</span><b id="wr">—</b></div>
+      <div class="row"><span>Nature</span><b id="wt">—</b></div>
+      <div class="row"><span>Montant</span><b id="wm">—</b></div>
+      <div class="row"><span>Moyen</span><b id="wy">—</b></div>
+      <div class="row"><span>Nom</span><b id="wn">—</b></div>
+    </div>
+    <p class="note rv" id="payment-config">Le paiement en ligne n’est pas encore configuré. Aucune contribution ne sera débitée.</p>
+    <button class="btn rv" id="ver" type="button">🔄 Vérifier le statut auprès du serveur</button>
+    <button class="btn g rv" id="nw1" type="button">Nouvelle contribution</button>
+    <div class="sts rv" id="sts"></div>
+  </section>
+
+  <section id="sD" hidden>
+    <div class="tk rv">
+      <svg class="ck" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0"/><path d="M22 36l9 9 18-20" pathLength="1" stroke-dasharray="1"/></svg>
+      <div class="big" id="rb">0 FCFA</div>
+      <p class="ctr" style="font-size:13px;font-weight:700" id="re">—</p>
+      <hr>
+      <div class="row"><span>Référence</span><b id="rr">—</b></div>
+      <div class="row"><span>Nature</span><b id="rt">—</b></div>
+      <div class="row"><span>Montant</span><b id="rm">—</b></div>
+      <div class="row"><span>Frais</span><b id="rf">—</b></div>
+      <div class="row"><span>Montant net</span><b id="rn">—</b></div>
+      <div class="row"><span>Moyen</span><b id="ry">—</b></div>
+      <div class="row"><span>Date et heure</span><b id="rd">—</b></div>
+      <div class="row"><span>Réf. prestataire</span><b id="rp">—</b></div>
+      <hr>
+      <p class="thx">Merci pour votre contribution 🙏</p>
+    </div>
+    <p class="note rv">✅ Confirmation reçue. La contribution est inscrite dans le module financier.</p>
+    <button class="btn rv" id="nw2" type="button">Nouvelle contribution</button>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/motion@11.18.2/dist/motion.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+3 · E-OFFRING (PAIEMENT EXTERNE)
+================================
+
+Ouvrir : index.html  (double-clic)
+Accès libre, sans compte.
+
+Ce dossier contient tout ce qu'il faut : index.html, app.js, theme.css
+(la charte de couleurs est incluse directement dans theme.css).
+
+Le paiement reste désactivé tant que le prestataire n'est pas intégré côté
+serveur. Aucun montant ne sera débité et aucun reçu ne peut être confirmé.
+
+Les animations (GSAP, Motion) et la police Sora sont chargées depuis
+Internet. Sans réseau, la page reste entièrement utilisable mais sans
+animations. Aucune clé API n'est stockée dans cette page.

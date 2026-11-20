@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "CAM — Espace membres",
+  "short_name": "CAM Membres",
+  "description": "Espace privé des membres CAM : activités, enseignements, contributions et carte de membre.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": "./connexion.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0f1115",
+  "categories": ["lifestyle", "productivity"],
+  "icons": [
+    { "src": "icons/metanoia-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/metanoia-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/metanoia-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
